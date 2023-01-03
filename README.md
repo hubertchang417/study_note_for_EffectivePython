@@ -87,7 +87,49 @@ if __name__ == '__main__':
     # > <__main__.Blank object at 0x000001F42091BBE0>
 ```
 ## \_\_iter\_\_
+在python中， ```for x in foo``` 事實上就是呼叫```iter(foo)```來執行迴圈， 
+而在class物件中，可以設定 \_\_iter\_\_ method 讓我們的class像一個generator來執行
+```Python
+class Test:
+    def __init__(self, max_size):
+        self.max_size = max_size
+   
+    def __iter__(self):
+        for i in range(self.max_size):
+            yield int(i)
+           
+           
+if __name__ == '__main__':
+   
+    a = Test(10)
+    print(list(a))
+    # > [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+也可以在 ( )之中放入list comprehebsion 來創造generator (item 32)
+```Python
+it = (len(x) for x in range(10))
+print(it)
+print(next(it))
+print(next(it))
+# > <generator object <genexpr> at 0x0000023A853A2110>
+# > 0
+# > 1
+```
 ## \_\_dict\_\_
+查看物件內的參數，以dictionary的形式儲存
+```Python
+class Test:
+    def __init__(self):
+        self.apple = 'I am apple'
+        self.orange = 'I am orange'  
+ 
+if __name__ == '__main__':
+    a = Test()
+    print(Test.__dict__)
+    print(a.__dict__)
+    # > {'__module__': '__main__', '__init__': <function Test.__init__ at 0x0000021463A6A0E0>, '__dict__': <attribute '__dict__' of 'Test' objects>, '__weakref__': <attribute '__weakref__' of 'Test' objects>, '__doc__': None}
+    # > {'apple': 'I am apple', 'orange': 'I am orange'}
+```
 ## \_\_getattr\_\_
 ## \_\_getattribute\_\_
 ## hasattr(object, name)
@@ -123,3 +165,45 @@ if __name__ == '__main__':
     # > 10
     # > 11
 ```
+## yield from
+我們可以透過 yield from 來組合多個Generators(Item 33)
+```Python
+def move(period, speed):
+    for _ in range(period):
+        yield speed
+ 
+def pause(delay):
+    for _ in range(delay):
+        yield 0
+def animate():
+    for delta in move(2, 5.0):
+        yield delta
+    for delta in pause(1):
+        yield delta
+                   
+def new_animate():
+    yield  from move(2, 5.0)
+    yield  from pause(1)
+     
+def run(func):
+    print(func.__name__)
+    for delta in func():
+        print(delta)    
+ 
+if __name__ == '__main__':
+    run(animate)
+    run(new_animate)
+    # > animate
+    # > 5.0
+    # > 5.0
+    # > 0
+    # > new_animate
+    # > 5.0
+    # > 5.0
+    # > 0
+
+```
+## next()
+## send()
+## itertools
+
